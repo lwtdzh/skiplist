@@ -1,0 +1,57 @@
+Complied on g++ at windows10 and ubuntu18.04.
+Include skiplist.hpp to use skiplist.
+Include safesl.hpp to use safety skiplist, which uses disk to guarantee the data safety.
+Include smsl.hpp to use skiplist based on shared_memory, which can only be compliled in Linux.
+
+Usage:
+    // Functions used:
+    //  0. Compare the size of two keys.
+    //  1. Convert key to string.
+    //  2. Convert key to binary.
+    //  3. Convert val to binary.
+    //  4. Parse key from binary.
+    //  5. Parse val from binary.
+    int cmp_int(const int& lhs, const int& rhs) { // Key comparing function.
+        return lhs - rhs;
+    }
+    std::string int2str(const int& val) { // Convert key to str to conveniently show on the screen.
+        static char buffer_tostr[32];
+        sprintf(buffer_tostr, "%d", val);
+        return buffer_tostr;
+    }
+    void int2binary(const int& key, Binary& bin) { // Convert key to binary data.
+        bin.set_data(sizeof(int), &key);
+    }
+    void binary2int(int& key, const Binary& bin) { // Convert binary data to key.
+        key = *(reinterpret_cast<int*>(bin.data));
+    }
+    void str2bin(const string& str, Binary& bin) { // Convert value to binary data.
+        static size_t str_bytes;
+        str_bytes = strlen(str.c_str()) * sizeof(char) + 1; // The last "\0" is included.
+        bin.set_data(str_bytes, str.c_str(), TAG_COPY);
+    }
+    void bin2str(string& str, const Binary& bin) { // Convert binary data to value.
+        str = reinterpret_cast<const char* const>(bin.data);
+    }
+        
+
+    // SkipList. You can get, set, delete. Data would be lost if closing the process.
+    SkipList<int, string> skiplist(cmp_int, int2str);
+    skiplist.set(100, "gaga");
+    skiplist.get(100);
+    skiplist.del(100);
+    
+    // Safe SkipList. Data would be restored by the log_file.
+    SafeSL<int, string> safesl(cmp_int, int2str, int2bin, str2bin, bin2int, bin2str, "log_file.data");
+    safesl.safe_set(100, "gaga");
+    safesl.safe_get(100);
+    safesl.safe_del(100);
+    safesl.dump_to_file("dump_file.data");
+    safesl.parse_from_file("dump_file.data");
+    safesl.restore("log_file.data", "dump_file.data(If existing)");
+    
+    // Shared_memory Skiplist(Smsl).
+    Smsl<int, int> smsl("./", cmp, tostr, true, 103);
+    smsl.set(100, 300);
+    smsl.get(100);
+    smsl.del(100);

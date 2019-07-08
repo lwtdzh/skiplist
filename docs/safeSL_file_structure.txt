@@ -1,0 +1,24 @@
+
+*****************************************************************
+Log File:
+
+Stores operations from beginning.
+If it is a set operation.
+[LOG_TIME][OPERATION_TAG] [KEY_BYTES] [KEY_BINARY_DATA] [VAL_BYTES] [VAL_BINARY_DATA]
+   long        int           size_t                         size_t
+
+If it is a del operation.
+[LOG_TIME][OPERATION_TAG] [KEY_BYTES] [KEY_BINARY_DATA]
+   long      int           size_t
+    
+*****************************************************************
+
+Dump File:
+
+Beginning position stores a time.
+[TIME]
+ long
+ 
+Then stores data.
+[KEY_BYTES] [KEY_BINARY_DATA] [VAL_BYTES] [VAL_BINARY_DATA]
+   size_t                        size_t
